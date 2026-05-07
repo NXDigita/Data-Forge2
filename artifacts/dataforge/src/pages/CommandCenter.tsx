@@ -1,12 +1,7 @@
 import { Link } from "wouter";
 import { candidate, heatmapData, challenges, skills } from "../data/mockData";
-import { LineChart, Line, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip } from "recharts";
+import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip } from "recharts";
 import { motion } from "framer-motion";
-
-const sparklineData1 = [{ v: 30 }, { v: 33 }, { v: 35 }, { v: 38 }, { v: 40 }, { v: 44 }, { v: 47 }];
-const sparklineData2 = [{ v: 88 }, { v: 89 }, { v: 89.5 }, { v: 90 }, { v: 90.8 }, { v: 91 }, { v: 91.2 }];
-const sparklineData3 = [{ v: 3 }, { v: 4 }, { v: 4 }, { v: 5 }, { v: 5 }, { v: 6 }, { v: 7 }];
-const sparklineData4 = [{ v: 40000 }, { v: 55000 }, { v: 68000 }, { v: 80000 }, { v: 95000 }, { v: 110000 }, { v: 124000 }];
 
 const HeatmapCell = ({ w, d, count }: { w: number; d: number; count: number }) => {
   const colors = ["#21262D", "#0e4429", "#006d32", "#26a641", "#39d353"];
@@ -35,49 +30,21 @@ export default function CommandCenter() {
           <div className="text-sm text-[#8B949E] mb-2">Simulations Run</div>
           <div className="text-3xl text-[#C4B5FD] font-mono font-bold">{candidate.simulations}</div>
           <div className="text-xs text-[#22C55E] mt-1">↑8 this month</div>
-          <div className="absolute bottom-2 right-2 w-[80px] h-[40px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={sparklineData1}>
-                <Line type="monotone" dataKey="v" stroke="#C4B5FD" strokeWidth={2} dot={false} isAnimationActive={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
         </div>
         <div className="bg-[#161B22] border border-[#30363D] rounded-lg p-4 hover:border-[#7C3AED] hover:shadow-[0_0_15px_rgba(124,58,237,0.15)] transition-all relative">
           <div className="text-sm text-[#8B949E] mb-2">Avg Model Accuracy</div>
           <div className="text-3xl text-[#22D3EE] font-mono font-bold">{candidate.accuracy}%</div>
           <div className="text-xs text-[#8B949E] mt-1">Top 12% globally</div>
-          <div className="absolute bottom-2 right-2 w-[80px] h-[40px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={sparklineData2}>
-                <Line type="monotone" dataKey="v" stroke="#22D3EE" strokeWidth={2} dot={false} isAnimationActive={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
         </div>
         <div className="bg-[#161B22] border border-[#30363D] rounded-lg p-4 hover:border-[#7C3AED] hover:shadow-[0_0_15px_rgba(124,58,237,0.15)] transition-all relative">
           <div className="text-sm text-[#8B949E] mb-2">NFT Badges</div>
           <div className="text-3xl text-[#22C55E] font-mono font-bold">{candidate.badges}</div>
           <div className="text-xs text-[#8B949E] mt-1">2 minted this month</div>
-          <div className="absolute bottom-2 right-2 w-[80px] h-[40px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={sparklineData3}>
-                <Line type="monotone" dataKey="v" stroke="#22C55E" strokeWidth={2} dot={false} isAnimationActive={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
         </div>
         <div className="bg-[#161B22] border border-[#30363D] rounded-lg p-4 hover:border-[#7C3AED] hover:shadow-[0_0_15px_rgba(124,58,237,0.15)] transition-all relative">
           <div className="text-sm text-[#8B949E] mb-2">Total Earned</div>
           <div className="text-3xl text-[#F59E0B] font-mono font-bold">{candidate.earned}</div>
           <div className="text-xs text-[#8B949E] mt-1">23 projects</div>
-          <div className="absolute bottom-2 right-2 w-[80px] h-[40px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={sparklineData4}>
-                <Line type="monotone" dataKey="v" stroke="#F59E0B" strokeWidth={2} dot={false} isAnimationActive={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
         </div>
       </div>
 
