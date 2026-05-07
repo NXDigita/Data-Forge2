@@ -1,6 +1,8 @@
 import { Trophy, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { useGame } from "../context/GameContext";
+import { motion, AnimatePresence } from "framer-motion";
 
-const leaders = [
+const BASE_LEADERS = [
   { rank: 1, name: "Arjun Mehta", initials: "AM", city: "Mumbai", tier: "Master", tfes: 96, simulations: 83, accuracy: 94.1, earned: "₹3.2L", change: "same" },
   { rank: 2, name: "Sneha Iyer", initials: "SI", city: "Bengaluru", tier: "Master", tfes: 93, simulations: 71, accuracy: 93.4, earned: "₹2.8L", change: "up" },
   { rank: 3, name: "Karan Patel", initials: "KP", city: "Hyderabad", tier: "Master", tfes: 91, simulations: 68, accuracy: 92.8, earned: "₹2.5L", change: "down" },
@@ -22,6 +24,20 @@ const tierColors: Record<string, string> = {
 const rankColors = ["text-[#F59E0B]", "text-[#8B949E]", "text-[#C084FC]"];
 
 export default function Leaderboard() {
+  const { userRank, userTFES, userSimulations, submissions } = useGame();
+  const hasSubmissions = submissions.length > 0;
+
+  const leaders = BASE_LEADERS.map((l) => {
+    if (!l.isMe) return l;
+    return {
+      ...l,
+      rank: userRank,
+      tfes: userTFES,
+      simulations: userSimulations,
+      change: hasSubmissions ? "up" : l.change,
+    };
+  }).sort((a, b) => a.rank - b.rank);
+
   return (
     <div className="animate-in fade-in duration-500">
       <div className="flex justify-between items-center mb-6">
@@ -41,14 +57,32 @@ export default function Leaderboard() {
         </div>
       </div>
 
+      {/* Live update banner */}
+      <AnimatePresence>
+        {hasSubmissions && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="mb-5 flex items-center gap-3 bg-[#052E16] border border-[#14532D] rounded-lg px-4 py-2.5"
+          >
+            <TrendingUp className="w-4 h-4 text-[#22C55E] shrink-0" />
+            <span className="text-sm text-[#22C55E] font-medium">
+              Your rank updated to <span className="font-mono font-bold">#{userRank}</span> after {submissions.length} submission{submissions.length > 1 ? "s" : ""}
+            </span>
+            <span className="ml-auto font-mono text-xs text-[#22C55E]">TFES {userTFES}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Top 3 podium */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         {[leaders[1], leaders[0], leaders[2]].map((l, i) => {
           const podiumRank = i === 0 ? 2 : i === 1 ? 1 : 3;
           const heights = ["h-28", "h-36", "h-24"];
           return (
-            <div key={l.rank} className={`bg-[#161B22] border border-[#30363D] rounded-lg p-4 flex flex-col items-center justify-end ${heights[i]} ${podiumRank === 1 ? "border-[#F59E0B] shadow-[0_0_20px_rgba(245,158,11,0.15)]" : ""}`}>
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm mb-2 ${podiumRank === 1 ? "bg-[#F59E0B] text-black" : podiumRank === 2 ? "bg-[#8B949E] text-black" : "bg-[#C084FC] text-black"}`}>
+            <div key={l.rank} className={`bg-[#161B22] border border-[#30363D] rounded-lg p-4 flex flex-col items-center justify-end ${heights[i]} ${podiumRank === 1 ? "border-[#F59E0B] shadow-[0_0_20px_rgba(245,158,11,0.15)]" : ""} ${l.isMe ? "border-[#7C3AED] shadow-[0_0_20px_rgba(124,58,237,0.15)]" : ""}`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm mb-2 ${l.isMe ? "bg-[#7C3AED] text-white" : podiumRank === 1 ? "bg-[#F59E0B] text-black" : podiumRank === 2 ? "bg-[#8B949E] text-black" : "bg-[#C084FC] text-black"}`}>
                 {l.initials}
               </div>
               <div className="text-white font-semibold text-sm text-center">{l.name}</div>
@@ -72,14 +106,13 @@ export default function Leaderboard() {
           <span>Earned</span>
         </div>
         {leaders.map((l) => (
-          <div
-            key={l.rank}
+          <motion.div
+            key={`${l.name}-${l.rank}`}
+            layout
             className={`grid grid-cols-[40px_1fr_120px_80px_100px_100px_100px] px-4 py-3 border-b border-[#30363D] gap-4 items-center transition-colors ${l.isMe ? "bg-[#1C1038] border-l-[3px] border-l-[#7C3AED]" : "hover:bg-[#21262D]"}`}
             data-testid={`row-leader-${l.rank}`}
           >
-            <span className={`font-mono font-bold text-sm ${rankColors[l.rank - 1] ?? "text-[#E6EDF3]"}`}>
-              {l.rank}
-            </span>
+            <span className={`font-mono font-bold text-sm ${rankColors[l.rank - 1] ?? "text-[#E6EDF3]"}`}>{l.rank}</span>
             <div className="flex items-center gap-3 min-w-0">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${l.isMe ? "bg-[#7C3AED] text-white" : "bg-[#21262D] text-[#8B949E]"}`}>
                 {l.initials}
@@ -102,7 +135,7 @@ export default function Leaderboard() {
               {l.change === "down" && <TrendingDown className="w-3 h-3 text-[#EF4444]" />}
               {l.change === "same" && <Minus className="w-3 h-3 text-[#8B949E]" />}
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>

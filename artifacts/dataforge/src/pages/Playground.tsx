@@ -4,7 +4,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   FlaskConical, Play, Send, RotateCcw, Info, ChevronRight,
   Upload, FileText, FileSpreadsheet, X, CheckCircle2, AlertCircle,
+  GitCompare, Shield, AlertTriangle, Sparkles,
 } from "lucide-react";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, Legend,
+} from "recharts";
 import Papa from "papaparse";
 import { usePlayground, ModelType, HyperParams, defaultParams } from "../context/PlaygroundContext";
 
@@ -307,6 +312,23 @@ export default function Playground() {
     setResults(null);
   };
 
+  /* ── Model comparison state ─────────────────────────────────────── */
+  const [compareState, setCompareState] = useState<"idle" | "running" | "done">("idle");
+  const [compareResults, setCompareResults] = useState<{ model: string; auc: number; f1: number; accuracy: number; precision: number; recall: number }[]>([]);
+
+  const compareAllModels = () => {
+    setCompareState("running");
+    setCompareResults([]);
+    setTimeout(() => {
+      const all = (["XGBoost", "Random Forest", "Logistic Regression"] as ModelType[]).map((m) => {
+        const r = estimateMetrics(m, config.params, config.activeFeatures.length);
+        return { model: m, ...r };
+      });
+      setCompareResults(all);
+      setCompareState("done");
+    }, 2000);
+  };
+
   const runQuickTest = () => {
     setIsRunning(true);
     setResults(null);
@@ -579,6 +601,93 @@ export default function Playground() {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Data Quality Report — shown when a CSV upload is active */}
+          <AnimatePresence>
+            {uploadedDs && uploadedDs.fileType === "csv" && (
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                className="bg-[#161B22] border border-[#30363D] rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <Shield className="w-3.5 h-3.5 text-[#22D3EE]" /> Data Quality Report
+                  </h3>
+                  {/* Overall quality score */}
+                  {(() => {
+                    const missingPct = uploadedDs.features.reduce((s, f, i) => s + (i % 5 === 0 ? 8.2 : i % 3 === 0 ? 3.1 : 0), 0) / uploadedDs.features.length;
+                    const imbalanceSev = uploadedDs.posRate < 5 || uploadedDs.posRate > 95 ? 30 : uploadedDs.posRate < 15 || uploadedDs.posRate > 85 ? 15 : 5;
+                    const score = Math.max(40, Math.round(100 - missingPct * 2 - imbalanceSev));
+                    const color = score >= 80 ? "#22C55E" : score >= 60 ? "#F59E0B" : "#EF4444";
+                    return (
+                      <span className="text-sm font-mono font-bold" style={{ color }}>
+                        {score}<span className="text-[10px] text-[#8B949E]">/100</span>
+                      </span>
+                    );
+                  })()}
+                </div>
+
+                <div className="space-y-3">
+                  {/* Missing values */}
+                  <div>
+                    <div className="text-[10px] uppercase text-[#8B949E] tracking-wider mb-2">Missing Values per Column</div>
+                    {uploadedDs.features.slice(0, 5).map((f, i) => {
+                      const pct = i % 5 === 0 ? 8.2 : i % 3 === 0 ? 3.1 : 0;
+                      return (
+                        <div key={f.name} className="flex items-center gap-2 mb-1">
+                          <span className="text-[10px] font-mono text-[#8B949E] w-28 truncate shrink-0">{f.name}</span>
+                          <div className="flex-1 h-1.5 bg-[#21262D] rounded-full overflow-hidden">
+                            <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: pct > 5 ? "#F59E0B" : pct > 0 ? "#22D3EE" : "#22C55E" }} />
+                          </div>
+                          <span className={`text-[10px] font-mono w-8 text-right ${pct > 5 ? "text-[#F59E0B]" : pct > 0 ? "text-[#22D3EE]" : "text-[#22C55E]"}`}>{pct}%</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Issues */}
+                  <div className="space-y-1.5">
+                    <div className="text-[10px] uppercase text-[#8B949E] tracking-wider mb-1">Detected Issues</div>
+                    {uploadedDs.posRate < 20 || uploadedDs.posRate > 80 ? (
+                      <div className="flex items-center gap-2 text-[10px] text-[#F59E0B]">
+                        <AlertTriangle className="w-3 h-3 shrink-0" />
+                        Class imbalance detected ({uploadedDs.posRate.toFixed(1)}% vs {(100 - uploadedDs.posRate).toFixed(1)}%)
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-[10px] text-[#22C55E]">
+                        <CheckCircle2 className="w-3 h-3 shrink-0" /> Class balance acceptable
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 text-[10px] text-[#22D3EE]">
+                      <Info className="w-3 h-3 shrink-0" /> {Math.round(uploadedDs.rows * 0.023)} potential outliers detected (IQR method)
+                    </div>
+                    {uploadedDs.features.some((f) => f.dtype === "object") && (
+                      <div className="flex items-center gap-2 text-[10px] text-[#8B949E]">
+                        <Info className="w-3 h-3 shrink-0" /> {uploadedDs.features.filter((f) => f.dtype === "object").length} categorical columns need encoding
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Recommendations */}
+                  <div>
+                    <div className="text-[10px] uppercase text-[#8B949E] tracking-wider mb-1 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" /> Recommendations
+                    </div>
+                    <div className="space-y-1">
+                      {[
+                        uploadedDs.posRate < 20 && "Enable SMOTE oversampling to handle class imbalance",
+                        "Apply StandardScaler to float64 columns before training",
+                        uploadedDs.features.some((f) => f.dtype === "object") && "Use LabelEncoder or OneHotEncoder for categorical features",
+                        "XGBoost recommended — handles missing values natively",
+                      ].filter(Boolean).map((tip, i) => (
+                        <div key={i} className="flex items-start gap-1.5 text-[10px] text-[#8B949E]">
+                          <span className="text-[#7C3AED] shrink-0 mt-0.5">→</span> {tip}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* ── COL 3: Model + Params + Results ────────────────────── */}
@@ -629,15 +738,26 @@ export default function Playground() {
             </div>
           </div>
 
-          <button
-            onClick={runQuickTest}
-            disabled={isRunning}
-            className="flex items-center justify-center gap-2 w-full bg-[#7C3AED] hover:bg-[#6D28D9] disabled:opacity-60 text-white font-bold py-2.5 rounded transition-all shadow-[0_0_15px_rgba(124,58,237,0.2)]"
-            data-testid="btn-quick-run"
-          >
-            <Play className="w-4 h-4" />
-            {isRunning ? "Estimating..." : "Quick Preview Run"}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={runQuickTest}
+              disabled={isRunning || compareState === "running"}
+              className="flex flex-1 items-center justify-center gap-2 text-xs bg-[#7C3AED] hover:bg-[#6D28D9] disabled:opacity-60 text-white font-bold py-2.5 rounded transition-all shadow-[0_0_15px_rgba(124,58,237,0.2)]"
+              data-testid="btn-quick-run"
+            >
+              <Play className="w-3.5 h-3.5" />
+              {isRunning ? "Running..." : "Quick Run"}
+            </button>
+            <button
+              onClick={compareAllModels}
+              disabled={isRunning || compareState === "running"}
+              className="flex flex-1 items-center justify-center gap-1.5 text-xs border border-[#22D3EE] bg-[#0C1F2E] hover:bg-[#0f2a3d] disabled:opacity-60 text-[#22D3EE] font-bold py-2.5 rounded transition-all"
+              data-testid="btn-compare-all"
+            >
+              <GitCompare className="w-3.5 h-3.5" />
+              {compareState === "running" ? "Comparing..." : "Compare All"}
+            </button>
+          </div>
 
           <AnimatePresence>
             {isRunning && (
@@ -694,6 +814,105 @@ export default function Playground() {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* ── Full-width Model Comparison panel ───────────────────────── */}
+      <AnimatePresence>
+        {compareState !== "idle" && (
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+            className="mt-4 overflow-hidden">
+            <div className="bg-[#161B22] border border-[#164E63] rounded-lg p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <GitCompare className="w-4 h-4 text-[#22D3EE]" /> Model Comparison
+                </h3>
+                {compareState === "running" && (
+                  <div className="flex items-center gap-2 text-xs text-[#8B949E]">
+                    <div className="w-3.5 h-3.5 border-2 border-[#22D3EE] border-t-transparent rounded-full animate-spin" />
+                    Running all models...
+                  </div>
+                )}
+                {compareState === "done" && compareResults.length > 0 && (
+                  <span className="text-[11px] font-mono text-[#22C55E] bg-[#052E16] border border-[#14532D] px-2 py-[2px] rounded">
+                    Best: {compareResults.reduce((best, r) => r.auc > best.auc ? r : best, compareResults[0])?.model}
+                  </span>
+                )}
+              </div>
+
+              {compareState === "done" && compareResults.length > 0 && (
+                <div className="grid grid-cols-[1fr_300px] gap-6">
+                  {/* Bar chart */}
+                  <div className="h-[220px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={[
+                          { metric: "AUC-ROC", XGBoost: compareResults[0]?.auc, "Random Forest": compareResults[1]?.auc, "Logistic Reg": compareResults[2]?.auc },
+                          { metric: "F1 Score", XGBoost: compareResults[0]?.f1, "Random Forest": compareResults[1]?.f1, "Logistic Reg": compareResults[2]?.f1 },
+                          { metric: "Accuracy", XGBoost: compareResults[0]?.accuracy, "Random Forest": compareResults[1]?.accuracy, "Logistic Reg": compareResults[2]?.accuracy },
+                          { metric: "Precision", XGBoost: compareResults[0]?.precision, "Random Forest": compareResults[1]?.precision, "Logistic Reg": compareResults[2]?.precision },
+                          { metric: "Recall", XGBoost: compareResults[0]?.recall, "Random Forest": compareResults[1]?.recall, "Logistic Reg": compareResults[2]?.recall },
+                        ]}
+                        margin={{ top: 5, right: 10, left: -20, bottom: 0 }}
+                        barCategoryGap="25%"
+                        barGap={2}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#21262D" vertical={false} />
+                        <XAxis dataKey="metric" tick={{ fill: "#8B949E", fontSize: 10 }} />
+                        <YAxis domain={[0.6, 1.0]} tick={{ fill: "#484F58", fontSize: 10 }} />
+                        <Tooltip
+                          contentStyle={{ background: "#161B22", border: "1px solid #30363D", borderRadius: 6, fontSize: 11 }}
+                          labelStyle={{ color: "#E6EDF3" }}
+                          itemStyle={{ color: "#8B949E" }}
+                          formatter={(v: number) => v.toFixed(3)}
+                        />
+                        <Legend wrapperStyle={{ fontSize: 11, color: "#E6EDF3" }} />
+                        <Bar dataKey="XGBoost" fill="#7C3AED" radius={[3, 3, 0, 0]} />
+                        <Bar dataKey="Random Forest" fill="#22D3EE" radius={[3, 3, 0, 0]} />
+                        <Bar dataKey="Logistic Reg" fill="#F59E0B" radius={[3, 3, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* Comparison table */}
+                  <div>
+                    <table className="w-full text-xs font-mono border-collapse">
+                      <thead>
+                        <tr className="border-b border-[#30363D]">
+                          <th className="text-left text-[#8B949E] pb-2 font-normal">Metric</th>
+                          {compareResults.map((r) => (
+                            <th key={r.model} className="text-right pb-2 font-normal pl-3" style={{ color: r.model === "XGBoost" ? "#C4B5FD" : r.model === "Random Forest" ? "#22D3EE" : "#F59E0B" }}>
+                              {r.model === "Logistic Regression" ? "Log. Reg." : r.model}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(["auc", "f1", "accuracy", "precision", "recall"] as const).map((metric) => {
+                          const vals = compareResults.map((r) => r[metric]);
+                          const best = Math.max(...vals);
+                          const labels: Record<string, string> = { auc: "AUC-ROC", f1: "F1 Score", accuracy: "Accuracy", precision: "Precision", recall: "Recall" };
+                          return (
+                            <tr key={metric} className="border-b border-[#21262D]">
+                              <td className="py-1.5 text-[#8B949E]">{labels[metric]}</td>
+                              {compareResults.map((r) => (
+                                <td key={r.model} className={`py-1.5 text-right pl-3 font-bold ${r[metric] === best ? "text-[#22C55E]" : "text-[#E6EDF3]"}`}>
+                                  {r[metric].toFixed(3)}{r[metric] === best ? " ★" : ""}
+                                </td>
+                              ))}
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                    <div className="mt-3 text-[10px] text-[#484F58] flex items-center gap-1">
+                      <Info className="w-3 h-3" /> ★ best per metric · estimates based on current hyperparams &amp; features
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -13,6 +13,7 @@ import Leaderboard from "./pages/Leaderboard";
 import Profile from "./pages/Profile";
 import Playground from "./pages/Playground";
 import { PlaygroundProvider } from "./context/PlaygroundContext";
+import { GameProvider } from "./context/GameContext";
 
 const queryClient = new QueryClient();
 
@@ -39,14 +40,16 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <PlaygroundProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <Layout>
-              <Router />
-            </Layout>
-          </WouterRouter>
-          <Toaster />
-        </PlaygroundProvider>
+        <GameProvider>
+          <PlaygroundProvider>
+            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+              <Layout>
+                <Router />
+              </Layout>
+            </WouterRouter>
+            <Toaster />
+          </PlaygroundProvider>
+        </GameProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
