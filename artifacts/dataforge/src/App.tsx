@@ -8,6 +8,9 @@ import Layout from "./components/Layout";
 import CommandCenter from "./pages/CommandCenter";
 import SimulationLab from "./pages/SimulationLab";
 import Portfolio from "./pages/Portfolio";
+import Challenges from "./pages/Challenges";
+import Leaderboard from "./pages/Leaderboard";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -17,6 +20,9 @@ function Router() {
       <Route path="/" component={CommandCenter} />
       <Route path="/simulation/:id" component={SimulationLab} />
       <Route path="/portfolio" component={Portfolio} />
+      <Route path="/challenges" component={Challenges} />
+      <Route path="/leaderboard" component={Leaderboard} />
+      <Route path="/profile" component={Profile} />
       <Route component={NotFound} />
     </Switch>
   );

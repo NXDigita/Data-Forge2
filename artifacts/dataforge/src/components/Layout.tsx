@@ -15,10 +15,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     { icon: LayoutDashboard, label: "Command Center", href: "/" },
     { icon: FlaskConical, label: "Simulation Lab", href: "/simulation/ML-CHURN-003" },
     { icon: Globe, label: "Portfolio Builder", href: "/portfolio" },
-    { icon: Target, label: "Challenges", href: "#" },
-    { icon: Trophy, label: "Leaderboard", href: "#" },
-    { icon: User, label: "Profile", href: "#" },
-    { icon: Settings, label: "Settings", href: "#" },
+    { icon: Target, label: "Challenges", href: "/challenges" },
+    { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
+    { icon: User, label: "Profile", href: "/profile" },
+    { icon: Settings, label: "Settings", href: "/profile" },
   ];
 
   return (
