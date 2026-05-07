@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from "wouter/preact"; // actually just standard React hooks
-import { useState as useReactState, useEffect as useReactEffect, useRef as useReactRef } from "react";
-import { useParams } from "wouter";
+import { useState, useEffect, useRef } from "react";
+import { useParams, useLocation } from "wouter";
 import { challenges, terminalLines } from "../data/mockData";
+import { usePlayground } from "../context/PlaygroundContext";
+import { FlaskConical, X } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceLine, Legend, BarChart, Bar, Cell } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -28,16 +29,17 @@ const barColors = ["#7C3AED", "#8B50EF", "#9A65F0", "#A97AF2", "#B88EF4", "#C7A3
 
 export default function SimulationLab() {
   const params = useParams();
-  const c = challenges[0]; // hardcoded for ML-CHURN-003 for now
+  const [, setLocation] = useLocation();
+  const { config, applied, clearApplied } = usePlayground();
+  const c = challenges[0];
 
-  // 'idle' | 'running' | 'complete'
-  const [stages, setStages] = useReactState<string[]>(Array(6).fill('idle'));
-  const [isRunning, setIsRunning] = useReactState(false);
-  const [isComplete, setIsComplete] = useReactState(false);
-  const [visibleLines, setVisibleLines] = useReactState(2);
-  const terminalRef = useReactRef<HTMLDivElement>(null);
+  const [stages, setStages] = useState<string[]>(Array(6).fill('idle'));
+  const [isRunning, setIsRunning] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+  const [visibleLines, setVisibleLines] = useState(2);
+  const terminalRef = useRef<HTMLDivElement>(null);
 
-  useReactEffect(() => {
+  useEffect(() => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
@@ -90,8 +92,39 @@ export default function SimulationLab() {
     }
   };
 
+  const p = config.params;
+  const modelLabel = config.selectedModel;
+
   return (
     <div className="animate-in fade-in duration-500 max-w-7xl mx-auto">
+      {/* Playground config banner */}
+      <AnimatePresence>
+        {applied && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="mb-4 flex items-center justify-between bg-[#1C1038] border border-[#4C1D95] rounded-lg px-4 py-2.5"
+          >
+            <div className="flex items-center gap-3">
+              <FlaskConical className="w-4 h-4 text-[#C4B5FD]" />
+              <span className="text-sm text-white font-medium">Playground config active</span>
+              <span className="text-xs font-mono text-[#C4B5FD] bg-[#0D1117] px-2 py-0.5 rounded border border-[#4C1D95]">
+                {modelLabel} · {config.activeFeatures.length} features · {config.params.smote ? "SMOTE on" : "SMOTE off"}
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setLocation("/playground")} className="text-xs text-[#C4B5FD] hover:text-white underline transition-colors">
+                Back to Playground
+              </button>
+              <button onClick={clearApplied} className="text-[#8B949E] hover:text-white transition-colors" data-testid="btn-dismiss-banner">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <div className="bg-[#161B22] border border-[#30363D] rounded-lg p-5 mb-4 flex justify-between">
         <div>
@@ -186,19 +219,49 @@ export default function SimulationLab() {
           </div>
 
           <div className="mt-4 bg-[#020409] border border-[#30363D] p-4 rounded-lg font-mono text-xs leading-relaxed overflow-x-auto">
-            <div><span className="text-[#484F58]"># XGBoost — Best Model (auto-selected)</span></div>
-            <div><span className="text-[#C084FC]">from</span> xgboost <span className="text-[#C084FC]">import</span> XGBClassifier</div>
-            <div><span className="text-[#C084FC]">from</span> imblearn.over_sampling <span className="text-[#C084FC]">import</span> SMOTE</div>
-            <div><span className="text-[#C084FC]">from</span> sklearn.model_selection <span className="text-[#C084FC]">import</span> train_test_split</div>
-            <br />
-            <div>X_res, y_res = SMOTE(random_state=<span className="text-[#F59E0B]">42</span>).fit_resample(X, y)</div>
-            <div>X_train, X_test, y_train, y_test = train_test_split(</div>
-            <div className="pl-4">X_res, y_res, test_size=<span className="text-[#F59E0B]">0.2</span>, stratify=y_res, random_state=<span className="text-[#F59E0B]">42</span>)</div>
-            <br />
-            <div>model = XGBClassifier(</div>
-            <div className="pl-4">n_estimators=<span className="text-[#F59E0B]">300</span>, max_depth=<span className="text-[#F59E0B]">6</span>, learning_rate=<span className="text-[#F59E0B]">0.05</span>,</div>
-            <div className="pl-4">subsample=<span className="text-[#F59E0B]">0.8</span>, colsample_bytree=<span className="text-[#F59E0B]">0.8</span>, random_state=<span className="text-[#F59E0B]">42</span>)</div>
-            <div>model.fit(X_train, y_train)</div>
+            {modelLabel === "XGBoost" && (<>
+              <div><span className="text-[#484F58]"># {applied ? "Playground config" : "XGBoost — Best Model (auto-selected)"}</span></div>
+              <div><span className="text-[#C084FC]">from</span> xgboost <span className="text-[#C084FC]">import</span> XGBClassifier</div>
+              {p.smote && <div><span className="text-[#C084FC]">from</span> imblearn.over_sampling <span className="text-[#C084FC]">import</span> SMOTE</div>}
+              <div><span className="text-[#C084FC]">from</span> sklearn.model_selection <span className="text-[#C084FC]">import</span> train_test_split</div>
+              <br />
+              {p.smote && <div>X_res, y_res = SMOTE(random_state=<span className="text-[#F59E0B]">42</span>).fit_resample(X, y)</div>}
+              <div>X_train, X_test, y_train, y_test = train_test_split(</div>
+              <div className="pl-4">{p.smote ? "X_res, y_res" : "X, y"}, test_size=<span className="text-[#F59E0B]">{p.testSize.toFixed(2)}</span>, stratify=y_res, random_state=<span className="text-[#F59E0B]">42</span>)</div>
+              <br />
+              <div>model = XGBClassifier(</div>
+              <div className="pl-4">n_estimators=<span className="text-[#F59E0B]">{p.nEstimators}</span>, max_depth=<span className="text-[#F59E0B]">{p.maxDepth}</span>, learning_rate=<span className="text-[#F59E0B]">{p.learningRate.toFixed(2)}</span>,</div>
+              <div className="pl-4">subsample=<span className="text-[#F59E0B]">{p.subsample.toFixed(2)}</span>, colsample_bytree=<span className="text-[#F59E0B]">0.8</span>, random_state=<span className="text-[#F59E0B]">42</span>)</div>
+              <div>model.fit(X_train, y_train)</div>
+            </>)}
+            {modelLabel === "Random Forest" && (<>
+              <div><span className="text-[#484F58]"># {applied ? "Playground config" : "Random Forest"}</span></div>
+              <div><span className="text-[#C084FC]">from</span> sklearn.ensemble <span className="text-[#C084FC]">import</span> RandomForestClassifier</div>
+              {p.smote && <div><span className="text-[#C084FC]">from</span> imblearn.over_sampling <span className="text-[#C084FC]">import</span> SMOTE</div>}
+              <div><span className="text-[#C084FC]">from</span> sklearn.model_selection <span className="text-[#C084FC]">import</span> train_test_split</div>
+              <br />
+              {p.smote && <div>X_res, y_res = SMOTE(random_state=<span className="text-[#F59E0B]">42</span>).fit_resample(X, y)</div>}
+              <div>X_train, X_test, y_train, y_test = train_test_split(</div>
+              <div className="pl-4">{p.smote ? "X_res, y_res" : "X, y"}, test_size=<span className="text-[#F59E0B]">{p.testSize.toFixed(2)}</span>, random_state=<span className="text-[#F59E0B]">42</span>)</div>
+              <br />
+              <div>model = RandomForestClassifier(</div>
+              <div className="pl-4">n_estimators=<span className="text-[#F59E0B]">{p.nEstimators}</span>, max_depth=<span className="text-[#F59E0B]">{p.maxDepth}</span>,</div>
+              <div className="pl-4">max_features=<span className="text-[#86EFAC]">'sqrt'</span>, random_state=<span className="text-[#F59E0B]">42</span>)</div>
+              <div>model.fit(X_train, y_train)</div>
+            </>)}
+            {modelLabel === "Logistic Regression" && (<>
+              <div><span className="text-[#484F58]"># {applied ? "Playground config" : "Logistic Regression"}</span></div>
+              <div><span className="text-[#C084FC]">from</span> sklearn.linear_model <span className="text-[#C084FC]">import</span> LogisticRegression</div>
+              {p.smote && <div><span className="text-[#C084FC]">from</span> imblearn.over_sampling <span className="text-[#C084FC]">import</span> SMOTE</div>}
+              <br />
+              {p.smote && <div>X_res, y_res = SMOTE(random_state=<span className="text-[#F59E0B]">42</span>).fit_resample(X, y)</div>}
+              <div>X_train, X_test, y_train, y_test = train_test_split(</div>
+              <div className="pl-4">{p.smote ? "X_res, y_res" : "X, y"}, test_size=<span className="text-[#F59E0B]">{p.testSize.toFixed(2)}</span>, random_state=<span className="text-[#F59E0B]">42</span>)</div>
+              <br />
+              <div>model = LogisticRegression(</div>
+              <div className="pl-4">C=<span className="text-[#F59E0B]">{p.cParam.toFixed(2)}</span>, max_iter=<span className="text-[#F59E0B]">{p.maxIter}</span>, random_state=<span className="text-[#F59E0B]">42</span>)</div>
+              <div>model.fit(X_train, y_train)</div>
+            </>)}
           </div>
         </div>
 

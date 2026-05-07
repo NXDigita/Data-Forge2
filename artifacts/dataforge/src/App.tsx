@@ -11,6 +11,8 @@ import Portfolio from "./pages/Portfolio";
 import Challenges from "./pages/Challenges";
 import Leaderboard from "./pages/Leaderboard";
 import Profile from "./pages/Profile";
+import Playground from "./pages/Playground";
+import { PlaygroundProvider } from "./context/PlaygroundContext";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +25,7 @@ function Router() {
       <Route path="/challenges" component={Challenges} />
       <Route path="/leaderboard" component={Leaderboard} />
       <Route path="/profile" component={Profile} />
+      <Route path="/playground" component={Playground} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -36,12 +39,14 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Layout>
-            <Router />
-          </Layout>
-        </WouterRouter>
-        <Toaster />
+        <PlaygroundProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <Layout>
+              <Router />
+            </Layout>
+          </WouterRouter>
+          <Toaster />
+        </PlaygroundProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

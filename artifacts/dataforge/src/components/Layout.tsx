@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Hexagon, LayoutDashboard, FlaskConical, Globe, Target, Trophy, User, Settings } from "lucide-react";
+import { Hexagon, LayoutDashboard, FlaskConical, Globe, Target, Trophy, User, Settings, Beaker } from "lucide-react";
 import { candidate } from "../data/mockData";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -14,6 +14,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const sidebarLinks = [
     { icon: LayoutDashboard, label: "Command Center", href: "/" },
     { icon: FlaskConical, label: "Simulation Lab", href: "/simulation/ML-CHURN-003" },
+    { icon: Beaker, label: "Playground", href: "/playground" },
     { icon: Globe, label: "Portfolio Builder", href: "/portfolio" },
     { icon: Target, label: "Challenges", href: "/challenges" },
     { icon: Trophy, label: "Leaderboard", href: "/leaderboard" },
