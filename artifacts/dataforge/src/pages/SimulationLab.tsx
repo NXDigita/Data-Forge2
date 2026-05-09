@@ -240,10 +240,16 @@ export default function SimulationLab() {
           <div className="text-xs text-[#8B949E] font-mono mb-1">{c.id} · {c.difficulty}</div>
           <h2 className="text-xl font-bold text-white mb-1">{c.title} — Telecom Dataset</h2>
           <p className="text-sm text-[#8B949E] mb-3">Binary classification · 7,043 rows · 21 features · Imbalanced dataset (26.5% positive churn rate)</p>
-          <div className="flex gap-2">
-            {c.models.concat(["SMOTE"]).map((m) => (
-              <span key={m} className="text-[11px] font-mono uppercase px-2 py-0.5 rounded bg-[#21262D] text-[#8B949E] border border-[#30363D]">{m}</span>
-            ))}
+        <div className="flex gap-2">
+          {(c.models || []).map((m) => (
+            <span key=
+              {m}
+          className="text-[11px] font-mono uppercase px-2 py-0.5 rounded bg-[#21262D] text-[#8B949E]"
+          >
+          {m}
+         </span>
+  ))
+</div>
           </div>
         </div>
         <div className="text-right flex flex-col items-end">
@@ -302,7 +308,17 @@ export default function SimulationLab() {
 
           <div className="bg-[#161B22] border border-[#30363D] rounded-lg p-3 flex flex-col gap-2">
             <h4 className="text-xs font-bold text-white uppercase mb-1 tracking-wider">Models</h4>
-            {c.models.map((m) => (
+            <div className="flex gap-2">
+              {(c.models || []).map((m) => (
+               <span
+                 key={m}
+                 className="text-[11px] font-mono uppercase px-2 py-0.5 rounded bg-[#21262D] text-[#8B949E]"
+               >
+                {m}
+               </span>
+             ))}
+            </div>
+            ))}
               <span key={m} className="text-[11px] font-mono uppercase px-2 py-1 rounded bg-[#1C1038] text-[#C4B5FD] border border-[#4C1D95] text-center">{m}</span>
             ))}
           </div>

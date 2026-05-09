@@ -1,29 +1,14 @@
+const PORT = Number(process.env.PORT) || 3000;
+const basePath = process.env.BASE_PATH || "/";
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
-const rawPort = process.env.PORT;
-
-if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
-}
-
-const port = Number(rawPort);
-
-if (Number.isNaN(port) || port <= 0) {
+if (Number.isNaN(PORT) || PORT <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
-}
-
-const basePath = process.env.BASE_PATH;
-
-if (!basePath) {
-  throw new Error(
-    "BASE_PATH environment variable is required but was not provided.",
-  );
 }
 
 export default defineConfig({
@@ -59,7 +44,7 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
-    port,
+    port: PORT,
     strictPort: true,
     host: "0.0.0.0",
     allowedHosts: true,
@@ -68,7 +53,7 @@ export default defineConfig({
     },
   },
   preview: {
-    port,
+    port: PORT,
     host: "0.0.0.0",
     allowedHosts: true,
   },
