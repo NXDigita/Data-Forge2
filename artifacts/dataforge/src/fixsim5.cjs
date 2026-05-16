@@ -1,0 +1,10 @@
+const fs = require('fs');
+let lines = fs.readFileSync('pages/SimulationLab.tsx', 'utf8').split('\n');
+lines[318] = '                        ))}';
+lines[320] = '                    )}';
+lines[322] = '                ))}';
+fs.writeFileSync('pages/SimulationLab.tsx', lines.join('\n'));
+console.log('319:', lines[318]);
+console.log('321:', lines[320]);
+console.log('323:', lines[322]);
+console.log('Fixed!');

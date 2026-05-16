@@ -318,7 +318,7 @@ export default function SimulationLab() {
                </span>
                         ))}
             </div>
-                    ))}
+                    )}
               <span key={m} className="text-[11px] font-mono uppercase px-2 py-1 rounded bg-[#1C1038] text-[#C4B5FD] border border-[#4C1D95] text-center">{m}</span>
                 ))}
           </div>
