@@ -291,8 +291,8 @@ export default function SimulationLab() {
         <div className="w-48 shrink-0 flex flex-col gap-4">
           <div className="bg-[#161B22] border border-[#30363D] rounded-lg p-3">
             <h4 className="text-xs font-bold text-white uppercase mb-2 tracking-wider">Dataset</h4>
-            <div className="text-sm text-[#22D3EE] font-mono break-all mb-1">{c.dataset.file}</div>
-            <div className="text-xs text-[#8B949E]">{c.dataset.rows.toLocaleString()} rows × {c.dataset.features} features</div>
+            <div className="text-sm text-[#22D3EE] font-mono break-all mb-1">{c.dataset?.file}</div>
+            <div className="text-xs text-[#8B949E]">{c.dataset?.rows.toLocaleString()} rows × {c.dataset?.features} features</div>
           </div>
 
           <div className="bg-[#161B22] border border-[#30363D] rounded-lg p-3">
