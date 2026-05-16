@@ -319,7 +319,6 @@ export default function SimulationLab() {
                         ))}
             </div>
                     )}
-                ))}
           </div>
         </div>
 
