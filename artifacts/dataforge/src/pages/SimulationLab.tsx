@@ -318,7 +318,6 @@ export default function SimulationLab() {
                </span>
                         ))}
             </div>
-                    )}
           </div>
         </div>
 
