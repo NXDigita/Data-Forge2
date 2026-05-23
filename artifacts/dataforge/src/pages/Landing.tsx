@@ -13,10 +13,16 @@ export default function Landing() {
         </div>
 
         <nav className="hidden md:flex items-center gap-6">
-          {["Dashboard", "SimLab", "DataEdge", "Challenges", "Leaderboard"].map((item) => (
-            <a key={item} href="#" className="text-sm text-[#8B949E] hover:text-white transition-colors">
-              {item}
-            </a>
+          {[
+            { label: "Dashboard", href: "/dashboard" },
+            { label: "SimLab", href: "/simulation/ML-CHURN-003" },
+            { label: "DataEdge", href: "/playground" },
+            { label: "Challenges", href: "/challenges" },
+            { label: "Leaderboard", href: "/leaderboard" },
+          ].map(({ label, href }) => (
+            <Link key={label} href={href} className="text-sm text-[#8B949E] hover:text-white transition-colors">
+              {label}
+            </Link>
           ))}
         </nav>
 
