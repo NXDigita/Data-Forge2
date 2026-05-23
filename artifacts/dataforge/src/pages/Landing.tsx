@@ -23,13 +23,13 @@ export default function Landing() {
         <div className="flex items-center gap-3">
           <button className="relative text-[#8B949E] hover:text-white transition-colors">
             <Bell className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#F97316] text-white text-[9px] flex items-center justify-center font-bold">3</span>
+            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#7C3AED] text-white text-[9px] flex items-center justify-center font-bold">3</span>
           </button>
           <button className="text-sm text-[#8B949E] hover:text-white transition-colors px-3 py-1.5">
             Sign In
           </button>
           <Link href="/dashboard">
-            <button className="text-sm font-semibold bg-[#F97316] hover:bg-[#EA6C0A] text-white px-4 py-2 rounded transition-colors">
+            <button className="text-sm font-semibold bg-[#7C3AED] hover:bg-[#6D28D9] text-white px-4 py-2 rounded transition-colors">
               Start Simulation
             </button>
           </Link>
@@ -52,7 +52,7 @@ export default function Landing() {
 
         <div className="relative z-10 max-w-4xl mx-auto">
           {/* Tag line */}
-          <div className="flex items-center justify-center gap-1.5 mb-8 text-[#F97316] text-[11px] font-semibold tracking-[0.18em] uppercase">
+          <div className="flex items-center justify-center gap-1.5 mb-8 text-[#A78BFA] text-[11px] font-semibold tracking-[0.18em] uppercase">
             <ChevronRight className="w-3 h-3" />
             <span>ML · NLP · CV · STATISTICS — DATA ENGINE v2.0</span>
           </div>
@@ -60,9 +60,9 @@ export default function Landing() {
           {/* Main headline */}
           <h1 className="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight mb-6">
             <span className="text-white">Your Models.</span>{" "}
-            <span className="text-[#F97316]">AI-Scored.</span>
+            <span className="text-[#7C3AED]">AI-Scored.</span>
             <br />
-            <span className="text-[#F97316]">Blockchain-Verified.</span>
+            <span className="text-[#7C3AED]">Blockchain-Verified.</span>
           </h1>
 
           {/* Subheading */}
@@ -73,7 +73,7 @@ export default function Landing() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/dashboard">
-              <button className="flex items-center gap-2 bg-[#F97316] hover:bg-[#EA6C0A] text-white font-bold text-base px-7 py-3.5 rounded transition-all hover:scale-105 active:scale-95 shadow-lg shadow-[#F97316]/20">
+              <button className="flex items-center gap-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-bold text-base px-7 py-3.5 rounded transition-all hover:scale-105 active:scale-95 shadow-lg shadow-[#7C3AED]/30">
                 <Zap className="w-4 h-4" />
                 Start Simulating — Free
               </button>
@@ -106,7 +106,7 @@ export default function Landing() {
       {/* Features Section */}
       <section className="py-24 px-6 max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <p className="text-[#F97316] text-xs font-semibold uppercase tracking-[0.2em] mb-3">What You Get</p>
+          <p className="text-[#A78BFA] text-xs font-semibold uppercase tracking-[0.2em] mb-3">What You Get</p>
           <h2 className="text-3xl md:text-4xl font-bold text-white">Everything You Need to Prove Your Skills</h2>
           <p className="text-[#8B949E] mt-4 max-w-xl mx-auto">From raw data to a verified credential — the full pipeline in one platform.</p>
         </div>
@@ -147,15 +147,15 @@ export default function Landing() {
             },
             {
               icon: Award,
-              color: "#F97316",
-              bg: "#2A1207",
-              border: "#7C2D12",
+              color: "#A78BFA",
+              bg: "#1C1038",
+              border: "#4C1D95",
               title: "NFT Badge Wall",
               desc: "Complete challenges to earn domain-specific badges (Fraud Detection, NLP Master, etc.) that appear on your portfolio.",
             },
             {
               icon: Users,
-              color: "#A78BFA",
+              color: "#C4B5FD",
               bg: "#1C1038",
               border: "#4C1D95",
               title: "Global Leaderboard",
@@ -183,9 +183,9 @@ export default function Landing() {
       {/* Bottom CTA Banner */}
       <section className="py-20 px-6">
         <div className="max-w-3xl mx-auto text-center rounded-2xl border border-[#30363D] bg-[#161B22] p-14 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#7C3AED]/10 via-transparent to-[#F97316]/10 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#7C3AED]/15 via-transparent to-[#4C1D95]/15 pointer-events-none" />
           <div className="relative z-10">
-            <p className="text-[#F97316] text-xs font-semibold uppercase tracking-[0.2em] mb-3">Ready to compete?</p>
+            <p className="text-[#A78BFA] text-xs font-semibold uppercase tracking-[0.2em] mb-3">Ready to compete?</p>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Your portfolio won't build itself.
             </h2>
@@ -193,7 +193,7 @@ export default function Landing() {
               Join thousands of data scientists who've already earned verified credentials and landed top roles.
             </p>
             <Link href="/dashboard">
-              <button className="inline-flex items-center gap-2 bg-[#F97316] hover:bg-[#EA6C0A] text-white font-bold text-base px-8 py-4 rounded transition-all hover:scale-105 active:scale-95 shadow-lg shadow-[#F97316]/20">
+              <button className="inline-flex items-center gap-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-bold text-base px-8 py-4 rounded transition-all hover:scale-105 active:scale-95 shadow-lg shadow-[#7C3AED]/30">
                 <Zap className="w-4 h-4" />
                 Get Started — It's Free
               </button>
