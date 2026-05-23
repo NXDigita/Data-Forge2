@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 import Layout from "./components/Layout";
+import Landing from "./pages/Landing";
 import CommandCenter from "./pages/CommandCenter";
 import SimulationLab from "./pages/SimulationLab";
 import Portfolio from "./pages/Portfolio";
@@ -17,16 +18,47 @@ import { GameProvider } from "./context/GameContext";
 
 const queryClient = new QueryClient();
 
-function Router() {
+function AppRoutes() {
   return (
     <Switch>
-      <Route path="/" component={CommandCenter} />
-      <Route path="/simulation/:id" component={SimulationLab} />
-      <Route path="/portfolio" component={Portfolio} />
-      <Route path="/challenges" component={Challenges} />
-      <Route path="/leaderboard" component={Leaderboard} />
-      <Route path="/profile" component={Profile} />
-      <Route path="/playground" component={Playground} />
+      <Route path="/" component={Landing} />
+      <Route path="/dashboard">
+        <Layout>
+          <CommandCenter />
+        </Layout>
+      </Route>
+      <Route path="/simulation/:id">
+        {(params) => (
+          <Layout>
+            <SimulationLab />
+          </Layout>
+        )}
+      </Route>
+      <Route path="/portfolio">
+        <Layout>
+          <Portfolio />
+        </Layout>
+      </Route>
+      <Route path="/challenges">
+        <Layout>
+          <Challenges />
+        </Layout>
+      </Route>
+      <Route path="/leaderboard">
+        <Layout>
+          <Leaderboard />
+        </Layout>
+      </Route>
+      <Route path="/profile">
+        <Layout>
+          <Profile />
+        </Layout>
+      </Route>
+      <Route path="/playground">
+        <Layout>
+          <Playground />
+        </Layout>
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );
@@ -43,9 +75,7 @@ function App() {
         <GameProvider>
           <PlaygroundProvider>
             <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-              <Layout>
-                <Router />
-              </Layout>
+              <AppRoutes />
             </WouterRouter>
             <Toaster />
           </PlaygroundProvider>

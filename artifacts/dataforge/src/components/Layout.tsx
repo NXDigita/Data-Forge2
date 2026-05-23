@@ -6,13 +6,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
 
   const navLinks = [
-    { label: "Command Center", href: "/" },
+    { label: "Command Center", href: "/dashboard" },
     { label: "Simulation Lab", href: "/simulation/ML-CHURN-003" },
     { label: "Portfolio", href: "/portfolio" },
   ];
 
   const sidebarLinks = [
-    { icon: LayoutDashboard, label: "Command Center", href: "/" },
+    { icon: LayoutDashboard, label: "Command Center", href: "/dashboard" },
     { icon: FlaskConical, label: "Simulation Lab", href: "/simulation/ML-CHURN-003" },
     { icon: Beaker, label: "Playground", href: "/playground" },
     { icon: Globe, label: "Portfolio Builder", href: "/portfolio" },
