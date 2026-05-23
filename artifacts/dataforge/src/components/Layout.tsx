@@ -26,11 +26,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-[#0D1117] text-[#E6EDF3] font-sans">
       {/* Top Navbar */}
       <header className="fixed top-0 left-0 right-0 z-50 h-[56px] bg-[#161B22] border-b border-[#30363D] flex items-center justify-between px-4">
-        <div className="flex items-center">
+        <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
           <Hexagon className="fill-[#7C3AED] text-[#7C3AED] w-7 h-7" />
           <span className="font-bold text-white text-base ml-2">DataForge</span>
           <span className="text-[11px] text-[#8B949E] ml-1 mt-1">by Talent Forge</span>
-        </div>
+        </Link>
 
         <nav className="flex gap-4">
           {navLinks.map((link) => {
